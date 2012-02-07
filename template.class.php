@@ -1,7 +1,7 @@
 <?php
 
 /*
-	[xTemplate for SAE	作者：李博]
+	[miniTemplate for SAE	作者：李博]
 */
 
 class template {
