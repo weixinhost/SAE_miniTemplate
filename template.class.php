@@ -7,7 +7,7 @@
 class template {
 
     private $cache_enable = true;
-	private $tplfolder;
+    private $tplfolder;
     private $tplfile;
     private $objfile;
     private $memcache;
