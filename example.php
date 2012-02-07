@@ -7,12 +7,10 @@ $view = new template();
 //设置是否开启缓存：0关闭 1开启 （true or false也可以0
 $view->set_cache_status(1);
 //设置模板文件所在目录，可以是相对目录也可以是绝对目录，推荐绝对目录
-$view->set_base_dir('./view');
+$view->set_base_dir('./templates');
 
 $data = array('a' => 'aaa', 'b' => 'bbb');
-
 $name = 'name';
-
 $flag = 1;
 
 //把变量推送到模板中，和smarty用法很像。
