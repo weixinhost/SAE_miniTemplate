@@ -1,0 +1,41 @@
+这是一款基于SAE的轻量级模板引擎：miniTemplate
+
+产品特点：
+
+1.极轻量：只有一个php文件；
+2.极高校：整个核心代码只有100多行，程序效率高，可参见xhprof记录；
+3.极简单：与smarty相似的使用方法，易上手。面向对象的使用方法，极灵活。
+
+
+使用注意：
+
+1.目前只支持运行于SAE（Sina App Engine http://sae.sina.com.cn/）
+2.需要开启SAE的Memcache服务，容量自定（比整个网站的模板文件大就可以）
+
+
+使用方法：
+
+//包含模板引擎文件
+include_once './template.class.php';
+
+//实例化
+$view = new template();
+//设置是否开启缓存：0关闭 1开启 （true or false也可以0
+$view->set_cache_status(1);
+//设置模板文件所在目录，可以是相对目录也可以是绝对目录，推荐绝对目录
+$view->set_base_dir('./templates');
+
+$data = array('a' => 'aaa', 'b' => 'bbb');
+$name = 'name';
+$flag = 1;
+
+//把变量推送到模板中，和smarty用法很像。
+//其中assign函数的第一个参数为变量在模板中读取时的名字（可以和变量名不同）。
+//例如assign('test', $m);，那么在模板里$test变量表示的就是$m
+$view->assign('data', $data);
+$view->assign('name', $name);
+$view->assign('flag', $flag);
+
+//显示模板文件，和smarty用法很像
+//这个文件在："./view/index.htm"
+$view->display('index.htm');
