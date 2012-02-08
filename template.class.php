@@ -18,7 +18,7 @@ class template {
 
     public function __construct() {
         $this->memcache = memcache_init();
-        $this->template();
+        ob_start();
     }
 
     public function set_base_dir($tplfolder) {
@@ -27,10 +27,6 @@ class template {
 
     public function set_cache_status($status) {
         $this->cache_enable = empty($status) ? false : true;
-    }
-
-    private function template() {
-        ob_start();
     }
 
     public function assign($k, $v) {
