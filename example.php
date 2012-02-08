@@ -4,8 +4,13 @@ include_once './template.class.php';
 
 //实例化
 $view = new template();
-//设置是否开启缓存：0关闭 1开启 （true or false也可以0
+
+//设置是否开启缓存：0关闭 1开启 默认true （true or false也可以）
 $view->set_cache_status(1);
+
+//设置是否开启Rewrite：0关闭 1开启 默认true （true or false也可以）
+$view->set_rewrite_status(1);
+
 //设置模板文件所在目录，可以是相对目录也可以是绝对目录，推荐绝对目录
 $view->set_base_dir('./templates');
 

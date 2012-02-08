@@ -7,6 +7,7 @@
 class template {
 
     private $cache_enable = true;
+    private $rewrite_enable = true;
     private $tplfolder;
     private $tplfile;
     private $objfile;
@@ -27,6 +28,10 @@ class template {
 
     public function set_cache_status($status) {
         $this->cache_enable = empty($status) ? false : true;
+    }
+
+    public function set_rewrite_status($status) {
+        $this->rewrite_enable = empty($status) ? false : true;
     }
 
     public function assign($k, $v) {
@@ -118,10 +123,11 @@ class template {
 
     public function __destruct() {
         $content = ob_get_contents();
-
-        $content = self::rewrite($content);
-
         ob_end_clean();
+
+        if ($this->rewrite_enable) {
+            $content = self::rewrite($content);
+        }
 
         echo $content;
     }
