@@ -1,8 +1,8 @@
 <?php
 
 /*
-	[miniTemplate for SAE	作者：李博]
-*/
+    [miniTemplate for SAE	作者：李博]
+ */
 
 class template {
 
@@ -110,8 +110,17 @@ class template {
         return $k ? "<? foreach((array)$arr as $k => $v) {?>$statement<?}?>" : "<? foreach((array)$arr as $v) {?>$statement<? } ?>";
     }
 
+    private function rewrite($content) {
+        //do some replace for rewriting
+
+        return $content;
+    }
+
     public function __destruct() {
         $content = ob_get_contents();
+
+        $content = self::rewrite($content);
+
         ob_end_clean();
 
         echo $content;
