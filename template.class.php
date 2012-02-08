@@ -11,14 +11,14 @@ class template {
     private $tplfolder;
     private $tplfile;
     private $objfile;
-    private $memcache;
     private $vars = array();
     private $var_regexp = "\@?\\\$[a-zA-Z_]\w*(?:\[[\w\.\"\'\[\]\$]+\])*";
     private $vtag_regexp = "\<\?=(\@?\\\$[a-zA-Z_]\w*(?:\[[\w\.\"\'\[\]\$]+\])*)\?\>";
     private $const_regexp = "\{([\w]+)\}";
+    private static $memcache;
 
     public function __construct() {
-        $this->memcache = memcache_init();
+        self::$memcache = memcache_init();
         ob_start();
     }
 
@@ -42,7 +42,7 @@ class template {
         extract($this->vars, EXTR_SKIP);
         $this->gettpl($file);
 
-        eval('?>'.$this->memcache->get($this->objfile));
+        eval('?>'.self::$memcache->get($this->objfile));
     }
 
     private function gettpl($file) {
@@ -53,10 +53,10 @@ class template {
 
         $filetime = filemtime($this->tplfile);
         $time_key = $this->objfile . '_' . 'time';
-        $lasttime = $this->memcache->get($time_key);
+        $lasttime = self::$memcache->get($time_key);
 
         if (((empty($lasttime)) || $filetime > $lasttime) || !$this->cache_enable) {
-            $this->memcache->set($time_key, $filetime);
+            self::$memcache->set($time_key, $filetime);
             $this->complie();
         }
     }
@@ -70,22 +70,22 @@ class template {
         $template = preg_replace("/(?<!\<\?\=|\\\\)$this->var_regexp/", "<?=\\0?>", $template);
 
 
-        $template = preg_replace("/\<\?=(\@?\\\$[a-zA-Z_]\w*)((\[[\\$\[\]\w]+\])+)\?\>/ies", "\$this->arrayindex('\\1', '\\2')", $template);
+        $template = preg_replace("/\<\?=(\@?\\\$[a-zA-Z_]\w*)((\[[\\$\[\]\w]+\])+)\?\>/ies", "self::arrayindex('\\1', '\\2')", $template);
 
-        $template = preg_replace("/\{\{eval (.*?)\}\}/ies", "\$this->stripvtag('<? \\1?>')", $template);
-        $template = preg_replace("/\{eval (.*?)\}/ies", "\$this->stripvtag('<? \\1?>')", $template);
+        $template = preg_replace("/\{\{eval (.*?)\}\}/ies", "self::stripvtag('<? \\1?>')", $template);
+        $template = preg_replace("/\{eval (.*?)\}/ies", "self::stripvtag('<? \\1?>')", $template);
 
-        $template = preg_replace("/\{elseif\s+(.+?)\}/ies", "\$this->stripvtag('<? } elseif(\\1) { ?>')", $template);
+        $template = preg_replace("/\{elseif\s+(.+?)\}/ies", "self::stripvtag('<? } elseif(\\1) { ?>')", $template);
 
         for($i=0; $i<2; $i++) {
-            $template = preg_replace("/\{loop\s+$this->vtag_regexp\s+$this->vtag_regexp\s+$this->vtag_regexp\}(.+?)\{\/loop\}/ies", "\$this->loopsection('\\1', '\\2', '\\3', '\\4')", $template);
-            $template = preg_replace("/\{loop\s+$this->vtag_regexp\s+$this->vtag_regexp\}(.+?)\{\/loop\}/ies", "\$this->loopsection('\\1', '', '\\2', '\\3')", $template);
+            $template = preg_replace("/\{loop\s+$this->vtag_regexp\s+$this->vtag_regexp\s+$this->vtag_regexp\}(.+?)\{\/loop\}/ies", "self::loopsection('\\1', '\\2', '\\3', '\\4')", $template);
+            $template = preg_replace("/\{loop\s+$this->vtag_regexp\s+$this->vtag_regexp\}(.+?)\{\/loop\}/ies", "self::loopsection('\\1', '', '\\2', '\\3')", $template);
         }
 
-        $template = preg_replace("/\{if\s+(.+?)\}/ies", "\$this->stripvtag('<? if(\\1) { ?>')", $template);
+        $template = preg_replace("/\{if\s+(.+?)\}/ies", "self::stripvtag('<? if(\\1) { ?>')", $template);
 
-        $template = preg_replace("/\{template\s+(\w+?)\}/is", "<? include \$this->gettpl('\\1');?>", $template);
-        $template = preg_replace("/\{template\s+(.+?)\}/ise", "\$this->stripvtag('<? include \$this->gettpl(\\1); ?>')", $template);
+        $template = preg_replace("/\{template\s+(\w+?)\}/is", "<? include self::gettpl('\\1');?>", $template);
+        $template = preg_replace("/\{template\s+(.+?)\}/ise", "self::stripvtag('<? include self::gettpl(\\1); ?>')", $template);
 
 
         $template = preg_replace("/\{else\}/is", "<? } else { ?>", $template);
@@ -95,10 +95,10 @@ class template {
 
         $template = preg_replace("/(\\\$[a-zA-Z_]\w+\[)([a-zA-Z_]\w+)\]/i", "\\1'\\2']", $template);
 
-        $this->memcache->set($this->objfile, $template);
+        self::$memcache->set($this->objfile, $template);
     }
 
-    private function arrayindex($name, $items) {
+    private static function arrayindex($name, $items) {
         $items = preg_replace("/\[([a-zA-Z_]\w*)\]/is", "['\\1']", $items);
         return "<?=$name$items?>";
     }
@@ -108,14 +108,14 @@ class template {
     }
 
     private function loopsection($arr, $k, $v, $statement) {
-        $arr = $this->stripvtag($arr);
-        $k = $this->stripvtag($k);
-        $v = $this->stripvtag($v);
+        $arr = self::stripvtag($arr);
+        $k = self::stripvtag($k);
+        $v = self::stripvtag($v);
         $statement = str_replace("\\\"", '"', $statement);
         return $k ? "<? foreach((array)$arr as $k => $v) {?>$statement<?}?>" : "<? foreach((array)$arr as $v) {?>$statement<? } ?>";
     }
 
-    private function rewrite($content) {
+    private static function rewrite($content) {
         //do some replace for rewriting
 
         return $content;
