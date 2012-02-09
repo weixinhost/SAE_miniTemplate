@@ -14,7 +14,8 @@
 3.极简单：与smarty相似的使用方法，易上手。面向对象的使用方法，极灵活；
 4.针对SAE（Sina App Engine http://sae.sina.com.cn/）：由于使用memcache存储最终解析生成的文件，因此程序在存储的key中加入了APPVERSION来区分每一个应用版本；
 5.支持rewrite替换，详见template.class.php中注释；
-6.支持模板嵌套。
+6.支持模板嵌套；
+7.智能更新：可以根据模板文件的变化自动更新缓存，同时支持包含文件的变化也自动更新缓存。
 
 
 使用注意：
