@@ -15,6 +15,7 @@ class template {
     private $var_regexp = "\@?\\\$[a-zA-Z_]\w*(?:\[[\w\.\"\'\[\]\$]+\])*";
     private $vtag_regexp = "\<\?=(\@?\\\$[a-zA-Z_]\w*(?:\[[\w\.\"\'\[\]\$]+\])*)\?\>";
     private $const_regexp = "\{([\w]+)\}";
+    private $page_content;
     private static $memcache;
 
     public function __construct() {
@@ -42,7 +43,11 @@ class template {
         extract($this->vars, EXTR_SKIP);
         $this->gettpl($file);
 
-        eval('?>'.self::$memcache->get($this->objfile));
+        if ($this->cache_enable) {
+            eval('?>'.self::$memcache->get($this->objfile));
+        } else {
+            eval('?>'.$this->page_content);
+        }
     }
 
     private function gettpl($file) {
@@ -51,7 +56,9 @@ class template {
 
         $this->tplfile = $this->tplfolder.'/'.$file;
 
-        $update = $this->checkupdate();
+        if ($this->cache_enable) {
+            $update = $this->checkupdate();
+        }
 
         if ($update || !$this->cache_enable) {
             $this->complie();
@@ -64,9 +71,8 @@ class template {
         $files[] = $this->tplfile;
 
         $template = file_get_contents($this->tplfile);
-        $template = preg_replace("/\<\!\-\-\{(.+?)\}\-\-\>/s", "{\\1}", $template);
-
         $res = preg_match_all("/\{template\s+(.+?)\}/ise", $template, $matches);
+
         if ($res) {
             foreach ($matches[1] as $file) {
                 $files[] = $this->tplfolder.'/'.$file;
@@ -82,7 +88,8 @@ class template {
 
             if ($filetime > $lasttime || empty($lasttime)) {
                 self::$memcache->set($time_key, $filetime);
-                $flag ++;
+                $flag = 1;
+                break;
             }
         }
 
@@ -128,7 +135,11 @@ class template {
 
         $template = preg_replace("/(\\\$[a-zA-Z_]\w+\[)([a-zA-Z_]\w+)\]/i", "\\1'\\2']", $template);
 
-        self::$memcache->set($this->objfile, $template);
+        $this->page_content = $template;
+
+        if ($this->cache_enable) {
+            self::$memcache->set($this->objfile, $template);
+        }
     }
 
     private static function arrayindex($name, $items) {
