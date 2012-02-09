@@ -22,6 +22,7 @@
 1.目前只支持运行于SAE（Sina App Engine http://sae.sina.com.cn/）
 2.需要开启SAE的Memcache服务，容量自定（比整个网站的模板文件大就可以）
 
+示例地址：http://libotest.sinaapp.com/
 
 使用方法：
 
