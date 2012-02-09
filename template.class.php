@@ -51,12 +51,9 @@ class template {
 
         $this->tplfile = $this->tplfolder.'/'.$file;
 
-        $filetime = filemtime($this->tplfile);
-        $time_key = $this->objfile . '_' . 'time';
-        $lasttime = self::$memcache->get($time_key);
+        $update = $this->checkupdate();
 
-        if (((empty($lasttime)) || $filetime > $lasttime) || !$this->cache_enable) {
-            self::$memcache->set($time_key, $filetime);
+        if ($update || !$this->cache_enable) {
             $this->complie();
         }
 
@@ -64,6 +61,37 @@ class template {
             $data = self::$memcache->get($this->objfile);
             return $data;
         }
+    }
+
+    private function checkupdate() {
+        $files = array();
+
+        $files[] = $this->tplfile;
+
+        $template = file_get_contents($this->tplfile);
+        $template = preg_replace("/\<\!\-\-\{(.+?)\}\-\-\>/s", "{\\1}", $template);
+
+        $res = preg_match_all("/\{template\s+(.+?)\}/ise", $template, $matches);
+        if ($res) {
+            foreach ($matches[1] as $file) {
+                $files[] = $this->tplfolder.'/'.$file;
+            }
+        }
+
+        $flag = 0;
+
+        foreach($files as $file) {
+            $filetime = filemtime($file);
+            $time_key = $file . '_' . 'time';
+            $lasttime = self::$memcache->get($time_key);
+
+            if ($filetime > $lasttime || empty($lasttime)) {
+                self::$memcache->set($time_key, $filetime);
+                $flag ++;
+            }
+        }
+
+        return $flag;
     }
 
     private function complie() {
