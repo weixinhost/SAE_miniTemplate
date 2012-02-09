@@ -84,6 +84,6 @@
         <!--{/loop}-->
     </ul>
     <h2>包含示例：</h2>
-    {template 'footer.htm'}
+    {template footer.htm}
     </body>
     </head>
