@@ -74,7 +74,7 @@ class template {
         if ($res) {
             foreach ($matches[1] as $file) {
                 $file_data = file_get_contents($this->tplfolder.'/'.$file);
-                $template = preg_replace("/\{template\s+(.+?)\}/ise", "\$file_data", $template);
+                $template = str_replace('{template ' . $file . '}', $file_data, $template);
             }
         }
 
