@@ -40,12 +40,12 @@ class template {
 
     public function display($file) {
         extract($this->vars, EXTR_SKIP);
-        $this->gettpl($file, false);
+        $this->gettpl($file);
 
         eval('?>'.self::$memcache->get($this->objfile));
     }
 
-    private function gettpl($file, $return = true) {
+    private function gettpl($file) {
         $this->objfile = $_SERVER['HTTP_APPVERSION'] . '_' . $this->tplfolder.'_'.$file;
         $this->objfile = md5($this->objfile);
 
@@ -55,11 +55,6 @@ class template {
 
         if ($update || !$this->cache_enable) {
             $this->complie();
-        }
-
-        if ($return) {
-            $data = self::$memcache->get($this->objfile);
-            return $data;
         }
     }
 
