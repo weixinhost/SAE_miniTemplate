@@ -19,7 +19,6 @@ class template {
     private static $memcache;
 
     public function __construct() {
-        self::$memcache = memcache_init();
         ob_start();
     }
 
@@ -57,6 +56,7 @@ class template {
         $this->tplfile = $this->tplfolder.'/'.$file;
 
         if ($this->cache_enable) {
+            self::$memcache = memcache_init();
             $update = $this->checkupdate();
         }
 
