@@ -11,6 +11,15 @@ $view->set_cache_status(1);
 //设置是否开启Rewrite：0关闭 1开启 默认true （true or false也可以）
 $view->set_rewrite_status(1);
 
+//rewrite规则
+$preg_searchs = array();
+$preg_replaces = array();
+
+$preg_searchs[] = "/index.php\?m=([a-z]+)/i";
+$preg_replaces[] = "$1.html";
+
+$view->set_rewrite_rules($preg_searchs, $preg_replaces);
+
 //设置模板文件所在目录，可以是相对目录也可以是绝对目录，推荐绝对目录
 $view->set_base_dir('./templates');
 

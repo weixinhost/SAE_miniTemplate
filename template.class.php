@@ -16,10 +16,17 @@ class template {
     private $vtag_regexp = "\<\?=(\@?\\\$[a-zA-Z_]\w*(?:\[[\w\.\"\'\[\]\$]+\])*)\?\>";
     private $const_regexp = "\{([\w]+)\}";
     private $page_content;
+    private $preg_searchs = array();
+	private $preg_replaces = array();
     private static $memcache;
 
     public function __construct() {
         ob_start();
+    }
+
+    public function set_rewrite_rules($searchs, $replaces) {
+        $this->preg_searchs = $searchs;
+        $this->preg_replaces = $replaces;
     }
 
     public function set_base_dir($tplfolder) {
@@ -159,8 +166,9 @@ class template {
         return $k ? "<? foreach((array)$arr as $k => $v) {?>$statement<?}?>" : "<? foreach((array)$arr as $v) {?>$statement<? } ?>";
     }
 
-    private static function rewrite($content) {
-        //do some replace for rewriting
+    private function rewrite($content) {
+
+        $content = preg_replace($this->preg_searchs, $this->preg_replaces, $content);
 
         return $content;
     }
