@@ -70,6 +70,14 @@ class template {
         $template = file_get_contents($this->tplfile);
         $template = preg_replace("/\<\!\-\-\{(.+?)\}\-\-\>/s", "{\\1}", $template);
 
+        $res = preg_match_all("/\{template\s+(.+?)\}/ise", $template, $matches);
+        if ($res) {
+            foreach ($matches[1] as $file) {
+                $file_data = file_get_contents($this->tplfolder.'/'.$file);
+                $template = preg_replace("/\{template\s+(.+?)\}/ise", "\$file_data", $template);
+            }
+        }
+
         $template = preg_replace("/\{($this->var_regexp)\}/", "<?=\\1?>", $template);
         $template = preg_replace("/\{($this->const_regexp)\}/", "<?=\\1?>", $template);
         $template = preg_replace("/(?<!\<\?\=|\\\\)$this->var_regexp/", "<?=\\0?>", $template);
@@ -88,9 +96,6 @@ class template {
         }
 
         $template = preg_replace("/\{if\s+(.+?)\}/ies", "self::stripvtag('<? if(\\1) { ?>')", $template);
-
-        $template = preg_replace("/\{template\s+(\w+?)\}/is", "<? echo self::gettpl('\\1');?>", $template);
-        $template = preg_replace("/\{template\s+(.+?)\}/ise", "self::stripvtag('<? echo self::gettpl(\\1); ?>')", $template);
 
 
         $template = preg_replace("/\{else\}/is", "<? } else { ?>", $template);
