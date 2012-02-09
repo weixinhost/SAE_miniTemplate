@@ -40,12 +40,12 @@ class template {
 
     public function display($file) {
         extract($this->vars, EXTR_SKIP);
-        $this->gettpl($file);
+        $this->gettpl($file, false);
 
         eval('?>'.self::$memcache->get($this->objfile));
     }
 
-    private function gettpl($file) {
+    private function gettpl($file, $return = true) {
         $this->objfile = $_SERVER['HTTP_APPVERSION'] . '_' . $this->tplfolder.'_'.$file;
         $this->objfile = md5($this->objfile);
 
@@ -58,6 +58,11 @@ class template {
         if (((empty($lasttime)) || $filetime > $lasttime) || !$this->cache_enable) {
             self::$memcache->set($time_key, $filetime);
             $this->complie();
+        }
+
+        if ($return) {
+            $data = self::$memcache->get($this->objfile);
+            return $data;
         }
     }
 
@@ -84,8 +89,8 @@ class template {
 
         $template = preg_replace("/\{if\s+(.+?)\}/ies", "self::stripvtag('<? if(\\1) { ?>')", $template);
 
-        $template = preg_replace("/\{template\s+(\w+?)\}/is", "<? include self::gettpl('\\1');?>", $template);
-        $template = preg_replace("/\{template\s+(.+?)\}/ise", "self::stripvtag('<? include self::gettpl(\\1); ?>')", $template);
+        $template = preg_replace("/\{template\s+(\w+?)\}/is", "<? echo \$this->gettpl('\\1');?>", $template);
+        $template = preg_replace("/\{template\s+(.+?)\}/ise", "\$this->stripvtag('<? echo \$this->gettpl(\\1); ?>')", $template);
 
 
         $template = preg_replace("/\{else\}/is", "<? } else { ?>", $template);
