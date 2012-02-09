@@ -5,11 +5,9 @@
 <title>The example page of miniTemplat for SAE</title>
 </head>
 <body>
-
 <h2>单独变量示例：</h2>
 <p>$name</p>
 <br />
-
 <h2>判断示例：</h2>
 <!--{if $flag == 1}-->
 <p>变量为1</p>
@@ -17,7 +15,6 @@
 <p>变量不为1</p>
 <!--{/if}-->
 <br />
-
 <h2>循环示例：</h2>
 <h4>foreach示例</h4>
 <ul>
@@ -25,5 +22,7 @@
     <li>$key：$value</li>
     <!--{/loop}-->
 </ul>
+<h2>包含示例：</h2>
+{template 'footer.htm'}
 </body>
 </head>

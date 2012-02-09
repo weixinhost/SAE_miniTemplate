@@ -24,32 +24,64 @@
 
 使用方法：
 
-//包含模板引擎文件
-include_once './template.class.php';
+    后端PHP：
 
-//实例化
-$view = new template();
+    //包含模板引擎文件
+    include_once './template.class.php';
 
-//设置是否开启缓存：0关闭 1开启 默认true （true or false也可以）
-$view->set_cache_status(1);
+    //实例化
+    $view = new template();
 
-//设置是否开启Rewrite：0关闭 1开启 默认true （true or false也可以）
-$view->set_rewrite_status(1);
+    //设置是否开启缓存：0关闭 1开启 默认true （true or false也可以）
+    $view->set_cache_status(1);
 
-//设置模板文件所在目录，可以是相对目录也可以是绝对目录，推荐绝对目录
-$view->set_base_dir('./templates');
+    //设置是否开启Rewrite：0关闭 1开启 默认true （true or false也可以）
+    $view->set_rewrite_status(1);
 
-$data = array('a' => 'aaa', 'b' => 'bbb');
-$name = 'name';
-$flag = 1;
+    //设置模板文件所在目录，可以是相对目录也可以是绝对目录，推荐绝对目录
+    $view->set_base_dir('./templates');
 
-//把变量推送到模板中，和smarty用法很像。
-//其中assign函数的第一个参数为变量在模板中读取时的名字（可以和变量名不同）。
-//例如assign('test', $m);，那么在模板里$test变量表示的就是$m
-$view->assign('data', $data);
-$view->assign('name', $name);
-$view->assign('flag', $flag);
+    $data = array('a' => 'aaa', 'b' => 'bbb');
+    $name = 'name';
+    $flag = 1;
 
-//显示模板文件，和smarty用法很像
-//这个文件在："./view/index.htm"
-$view->display('index.htm');
+    //把变量推送到模板中，和smarty用法很像。
+    //其中assign函数的第一个参数为变量在模板中读取时的名字（可以和变量名不同）。
+    //例如assign('test', $m);，那么在模板里$test变量表示的就是$m
+    $view->assign('data', $data);
+    $view->assign('name', $name);
+    $view->assign('flag', $flag);
+
+    //显示模板文件，和smarty用法很像
+    //这个文件在："./view/index.htm"
+    $view->display('index.htm');
+
+    模板文件：
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>The example page of miniTemplat for SAE</title>
+    </head>
+    <body>
+    <h2>单独变量示例：</h2>
+    <p>$name</p>
+    <br />
+    <h2>判断示例：</h2>
+    <!--{if $flag == 1}-->
+    <p>变量为1</p>
+    <!--{else}-->
+    <p>变量不为1</p>
+    <!--{/if}-->
+    <br />
+    <h2>循环示例：</h2>
+    <h4>foreach示例</h4>
+    <ul>
+        <!--{loop $data $key $value}-->
+        <li>$key：$value</li>
+        <!--{/loop}-->
+    </ul>
+    <h2>包含示例：</h2>
+    {template 'footer.htm'}
+    </body>
+    </head>
