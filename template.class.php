@@ -89,8 +89,8 @@ class template {
 
         $template = preg_replace("/\{if\s+(.+?)\}/ies", "self::stripvtag('<? if(\\1) { ?>')", $template);
 
-        $template = preg_replace("/\{template\s+(\w+?)\}/is", "<? echo \$this->gettpl('\\1');?>", $template);
-        $template = preg_replace("/\{template\s+(.+?)\}/ise", "\$this->stripvtag('<? echo \$this->gettpl(\\1); ?>')", $template);
+        $template = preg_replace("/\{template\s+(\w+?)\}/is", "<? echo self::gettpl('\\1');?>", $template);
+        $template = preg_replace("/\{template\s+(.+?)\}/ise", "self::stripvtag('<? echo self::gettpl(\\1); ?>')", $template);
 
 
         $template = preg_replace("/\{else\}/is", "<? } else { ?>", $template);
