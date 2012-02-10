@@ -27,11 +27,6 @@ class template {
         ob_start();
     }
 
-    public function set_rewrite_rules($searchs, $replaces) {
-        $this->preg_searchs = $searchs;
-        $this->preg_replaces = $replaces;
-    }
-
     public function set_base_dir($tplfolder) {
         $this->tplfolder = $tplfolder;
     }
@@ -42,6 +37,11 @@ class template {
 
     public function set_rewrite_status($status) {
         $this->rewrite_enable = empty($status) ? false : true;
+    }
+
+    public function set_rewrite_rules($searchs, $replaces) {
+        $this->preg_searchs = $searchs;
+        $this->preg_replaces = $replaces;
     }
 
     public function assign($k, $v) {
