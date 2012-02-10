@@ -2,6 +2,34 @@
 
 /*
     [miniTemplate for SAE	作者：李博]
+
+    使用方法：
+
+    include_once './template.class.php';
+    $view = new template();
+    $view->set_debug(false);
+    $view->set_cache_status(1);
+    $view->set_rewrite_status(1);
+
+    $preg_searchs = array();
+    $preg_replaces = array();
+
+    $preg_searchs[] = "/index.php\?m=([a-z]+)/i";
+    $preg_replaces[] = "$1.html";
+
+    $view->set_rewrite_rules($preg_searchs, $preg_replaces);
+
+    $view->set_base_dir('./templates');
+
+    $data = array('a' => 'aaa', 'b' => 'bbb');
+    $name = 'name';
+    $flag = 1;
+
+    $view->assign('data', $data);
+    $view->assign('name', $name);
+    $view->assign('flag', $flag);
+
+    $view->display('index.htm');
  */
 
 class template {
@@ -21,7 +49,7 @@ class template {
     private $page_content;
     private $ori_content;
     private $preg_searchs = array();
-	private $preg_replaces = array();
+    private $preg_replaces = array();
     private static $memcache;
 
     public function __construct() {
