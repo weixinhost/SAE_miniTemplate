@@ -5,6 +5,9 @@ include_once './template.class.php';
 //实例化
 $view = new template();
 
+//设置是否开启debug：true开启 false关闭 默认false
+$view->set_debug(false);
+
 //设置是否开启缓存：0关闭 1开启 默认true （true or false也可以）
 $view->set_cache_status(1);
 

@@ -6,6 +6,7 @@
 
 class template {
 
+    private $debug = false;
     private $cache_enable = true;
     private $rewrite_enable = true;
     private $tplfolder;
@@ -25,6 +26,10 @@ class template {
 
     public function __construct() {
         ob_start();
+    }
+
+    public function set_debug($status) {
+        $this->debug = $status;
     }
 
     public function set_base_dir($tplfolder) {
@@ -49,6 +54,8 @@ class template {
     }
 
     public function display($file) {
+        sae_set_display_errors($this->debug);
+
         extract($this->vars, EXTR_SKIP);
         $this->gettpl($file);
 
@@ -69,6 +76,12 @@ class template {
 
         if ($this->cache_enable) {
             self::$memcache = memcache_init();
+
+            if(self::$memcache == false) {
+                header("Content-type: text/html; charset=utf-8"); 
+                exit('miniTemplate错误提示：Memcache未激活或者初始化错误，请确认Memcache服务是否正常');
+            }
+
             $update = $this->checkupdate();
         }
 
