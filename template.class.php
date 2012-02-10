@@ -12,10 +12,13 @@ class template {
     private $tplfile;
     private $objfile;
     private $vars = array();
+    private $files = array();
+    private $include_files = array();
     private $var_regexp = "\@?\\\$[a-zA-Z_]\w*(?:\[[\w\.\"\'\[\]\$]+\])*";
     private $vtag_regexp = "\<\?=(\@?\\\$[a-zA-Z_]\w*(?:\[[\w\.\"\'\[\]\$]+\])*)\?\>";
     private $const_regexp = "\{([\w]+)\}";
     private $page_content;
+    private $ori_content;
     private $preg_searchs = array();
 	private $preg_replaces = array();
     private static $memcache;
@@ -62,6 +65,8 @@ class template {
 
         $this->tplfile = $this->tplfolder.'/'.$file;
 
+        $this->pre_process();
+
         if ($this->cache_enable) {
             self::$memcache = memcache_init();
             $update = $this->checkupdate();
@@ -72,23 +77,25 @@ class template {
         }
     }
 
-    private function checkupdate() {
-        $files = array();
+    private function pre_process() {
+        $this->ori_content = file_get_contents($this->tplfile);
 
-        $files[] = $this->tplfile;
+        $this->files[] = $this->tplfile;
 
-        $template = file_get_contents($this->tplfile);
-        $res = preg_match_all("/\{template\s+(.+?)\}/ise", $template, $matches);
+        $res = preg_match_all("/\{template\s+(.+?)\}/ise", $this->ori_content, $matches);
 
         if ($res) {
             foreach ($matches[1] as $file) {
-                $files[] = $this->tplfolder.'/'.$file;
+                $this->files[] = $this->tplfolder.'/'.$file;
+                $this->include_files[] = $file;
             }
         }
+    }
 
+    private function checkupdate() {
         $flag = 0;
 
-        foreach($files as $file) {
+        foreach($this->files as $file) {
             $filetime = filemtime($file);
             $time_key = $file . '_' . 'time';
             $lasttime = self::$memcache->get($time_key);
@@ -104,15 +111,12 @@ class template {
     }
 
     private function complie() {
-        $template = file_get_contents($this->tplfile);
+        $template = $this->ori_content;
         $template = preg_replace("/\<\!\-\-\{(.+?)\}\-\-\>/s", "{\\1}", $template);
 
-        $res = preg_match_all("/\{template\s+(.+?)\}/ise", $template, $matches);
-        if ($res) {
-            foreach ($matches[1] as $file) {
-                $file_data = file_get_contents($this->tplfolder.'/'.$file);
-                $template = str_replace('{template ' . $file . '}', $file_data, $template);
-            }
+        foreach ($this->include_files as $file) {
+            $file_data = file_get_contents($this->tplfolder.'/'.$file);
+            $template = str_replace('{template ' . $file . '}', $file_data, $template);
         }
 
         $template = preg_replace("/\{($this->var_regexp)\}/", "<?=\\1?>", $template);
