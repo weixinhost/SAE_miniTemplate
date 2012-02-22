@@ -138,7 +138,7 @@ class template {
 
         foreach($this->files as $file) {
             $filetime = filemtime($file);
-            $time_key = $file . '_' . 'time';
+            $time_key = $this->objfile . $file . '_' . 'time';
             $lasttime = self::$memcache->get($time_key);
 
             if ($filetime > $lasttime || empty($lasttime)) {
