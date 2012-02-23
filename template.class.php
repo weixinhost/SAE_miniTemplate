@@ -212,9 +212,19 @@ class template {
     }
 
     private function rewrite($content) {
+        if ($this->rewrite_enable) {
+            $content = preg_replace($this->preg_searchs, $this->preg_replaces, $content);
+        }
+        return $content;
+    }
 
-        $content = preg_replace($this->preg_searchs, $this->preg_replaces, $content);
-
+    private function ob_gzip($content) {
+        if (!headers_sent() && extension_loaded('zlib') && strstr($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')) {
+            $content = gzencode($content, 9);
+            header("Content-Encoding: gzip");
+            header("Vary: Accept-Encoding");
+            header("Content-Length: " . strlen($content));
+        }
         return $content;
     }
 
@@ -225,6 +235,7 @@ class template {
         if ($this->rewrite_enable) {
             $content = self::rewrite($content);
         }
+        $content = self::ob_gzip($content);
 
         echo $content;
     }
