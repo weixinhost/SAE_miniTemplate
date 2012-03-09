@@ -44,6 +44,9 @@
     //设置是否开启Rewrite：0关闭 1开启 默认true （true or false也可以）
     $view->set_rewrite_status(1);
 
+    //设置是否开启Gzip：0关闭 1开启 默认true （true or false也可以）
+    $view->set_gzip(1);
+
     //rewrite规则
     $preg_searchs = array();
     $preg_replaces = array();

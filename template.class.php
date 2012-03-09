@@ -35,6 +35,7 @@
 class template {
 
     private $debug = false;
+    private $gzip = false;
     private $cache_enable = true;
     private $rewrite_enable = true;
     private $tplfolder;
@@ -58,6 +59,10 @@ class template {
 
     public function set_debug($status) {
         $this->debug = $status;
+    }
+
+    public function set_gzip($status) {
+        $this->gzip = $status;
     }
 
     public function set_base_dir($tplfolder) {
@@ -235,7 +240,10 @@ class template {
         if ($this->rewrite_enable) {
             $content = self::rewrite($content);
         }
-        $content = self::ob_gzip($content);
+
+        if ($this->gzip) {
+            $content = self::ob_gzip($content);
+        }
 
         echo $content;
     }
