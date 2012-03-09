@@ -10,6 +10,7 @@
     $view->set_debug(false);
     $view->set_cache_status(1);
     $view->set_rewrite_status(1);
+    $view->set_gzip(1);
 
     $preg_searchs = array();
     $preg_replaces = array();
